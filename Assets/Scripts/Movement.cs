@@ -6,14 +6,18 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-    [SerializeField ]float thrustSpeed = 1000f;
-    [SerializeField] float rotationSpeed = 20f;
-    
 
+    [SerializeField] float thrustSpeed = 1000f;
+    [SerializeField] float rotationSpeed = 20f;
+    [SerializeField] AudioClip mainEngine;
+    [SerializeField] ParticleSystem jetParticle;
+
+    AudioSource myAudioSource;
     Rigidbody myRigidbody;
     // Start is called before the first frame update
     void Start()
     {
+        myAudioSource = GetComponent<AudioSource>();
         myRigidbody = GetComponent<Rigidbody>();
     }
 
@@ -26,11 +30,26 @@ public class Movement : MonoBehaviour
 
     private void ProcessThrust()
     {
-        if(Input.GetKey(KeyCode.Space))
+        if (Input.GetKey(KeyCode.Space))
         {
             myRigidbody.AddRelativeForce(Vector3.up * thrustSpeed * Time.deltaTime);
+            if (!myAudioSource.isPlaying)
+            {
+                myAudioSource.PlayOneShot(mainEngine);
+                
+            }
+            if (!jetParticle.isPlaying)
+            {
+                jetParticle.Play();
+            }
         }
-        
+        else
+        {
+            myAudioSource.Stop();
+            jetParticle.Stop();
+        }
+
+
     }
 
     private void ProcessRotation()
