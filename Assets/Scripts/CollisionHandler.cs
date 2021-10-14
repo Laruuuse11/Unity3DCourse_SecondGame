@@ -13,19 +13,37 @@ public class CollisionHandler : MonoBehaviour
     [SerializeField] ParticleSystem successParticle;
 
     AudioSource myAudioSource;
-    
 
     bool isTransitioning = false;
-    
+    bool collisionDisabled = false;
+        
 
     private void Start()
     {
         myAudioSource = GetComponent<AudioSource>();
     }
 
+    private void Update()
+    {
+        RespondToDebugKey();
+    }
+
+    private void RespondToDebugKey()
+    {
+        if(Input.GetKeyDown(KeyCode.L))
+        {
+            LoadNextScene();
+        }
+
+        else if(Input.GetKeyDown(KeyCode.C))
+        {
+            collisionDisabled = !collisionDisabled;
+        }
+    }
+
     private void OnCollisionEnter(Collision other)
     {
-        if (isTransitioning) { return; }
+        if (isTransitioning || collisionDisabled) { return; }
         
             switch (other.gameObject.tag)
             {
@@ -40,39 +58,35 @@ public class CollisionHandler : MonoBehaviour
                 default:
                     StartCrashSequence();
                     break;
-            }
-        
+            }        
     }
 
     void StartCrashSequence()
     {
         //todo add SFX upon crash
         //todo add particle effect upon crash
-        GetComponent<Movement>().enabled = false;
+        isTransitioning = true;
         myAudioSource.Stop();
         myAudioSource.PlayOneShot(crashSFX);
-        isTransitioning = true;
+        crashParticle.Play();
+        GetComponent<Movement>().enabled = false;
         Invoke("ReloadLevel", invokeCrashDelay);
-        
     }
 
     void StartSuccessSequence()
     {
         //todo add SFX upon finish
         //todo add particle effect upon finish
+       isTransitioning = true;
        myAudioSource.Stop();
        myAudioSource.PlayOneShot(successSFX);
        successParticle.Play();
-       GetComponent<Movement>().enabled = false;
-       isTransitioning = true;
-       Invoke("LoadNextScene", invokeFinishDelay);
-            
-        
+       GetComponent<Movement>().enabled = false;       
+       Invoke("LoadNextScene", invokeFinishDelay);                    
     }
 
     private void LoadNextScene()
     {
-        
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         int nextSceneIndex = currentSceneIndex + 1;
         if(nextSceneIndex == SceneManager.sceneCountInBuildSettings)
@@ -83,8 +97,7 @@ public class CollisionHandler : MonoBehaviour
     }
 
     private void ReloadLevel()
-    {
-        
+    {        
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(currentSceneIndex);
     }

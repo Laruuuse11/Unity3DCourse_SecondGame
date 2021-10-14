@@ -1,7 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
 using UnityEngine;
 
 public class Movement : MonoBehaviour
@@ -32,27 +28,40 @@ public class Movement : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Space))
         {
-            myRigidbody.AddRelativeForce(Vector3.up * thrustSpeed * Time.deltaTime);
-            if (!myAudioSource.isPlaying)
-            {
-                myAudioSource.PlayOneShot(mainEngine);
-                
-            }
-            if (!jetParticle.isPlaying)
-            {
-                jetParticle.Play();
-            }
+            StartTrusting();
         }
         else
         {
-            myAudioSource.Stop();
-            jetParticle.Stop();
+            StopTrusting();
         }
+    }
 
+    private void StopTrusting()
+    {
+        myAudioSource.Stop();
+        jetParticle.Stop();
+    }
 
+    private void StartTrusting()
+    {
+        myRigidbody.AddRelativeForce(Vector3.up * thrustSpeed * Time.deltaTime);
+        if (!myAudioSource.isPlaying)
+        {
+            myAudioSource.PlayOneShot(mainEngine);
+
+        }
+        if (!jetParticle.isPlaying)
+        {
+            jetParticle.Play();
+        }
     }
 
     private void ProcessRotation()
+    {
+        StartRotation();
+    }
+
+    private void StartRotation()
     {
         if (Input.GetKey(KeyCode.LeftArrow))
         {
